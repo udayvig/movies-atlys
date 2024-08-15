@@ -10,5 +10,5 @@ interface MoviesApiInterface {
     suspend fun getTrendingMovies(): List<MovieDto>
 
     @GET("/search/movie")
-    suspend fun getQueryMovie(@Query("query") query: String): List<MovieDto>
+    suspend fun getQueryMovies(@Query("query") query: String): List<MovieDto>
 }
