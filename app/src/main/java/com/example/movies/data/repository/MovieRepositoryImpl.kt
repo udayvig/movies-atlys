@@ -9,11 +9,11 @@ class MovieRepositoryImpl @Inject constructor(
     private val moviesApi: MoviesApiInterface
 ): MovieRepository {
 
-    override suspend fun getTrendingMovies(): List<MovieDto> {
+    override suspend fun getTrendingMovies(): MovieDto {
         return moviesApi.getTrendingMovies()
     }
 
-    override suspend fun getQueryMovies(query: String): List<MovieDto> {
+    override suspend fun getQueryMovies(query: String): MovieDto {
         return moviesApi.getQueryMovies(query = query)
     }
 }

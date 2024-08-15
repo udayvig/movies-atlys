@@ -7,8 +7,8 @@ import retrofit2.http.Query
 interface MoviesApiInterface {
 
     @GET("/trending/movie")
-    suspend fun getTrendingMovies(): List<MovieDto>
+    suspend fun getTrendingMovies(): MovieDto
 
     @GET("/search/movie")
-    suspend fun getQueryMovies(@Query("query") query: String): List<MovieDto>
+    suspend fun getQueryMovies(@Query("query") query: String): MovieDto
 }
