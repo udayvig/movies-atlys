@@ -1,8 +1,10 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("org.jetbrains.kotlin.kapt")
-    id("com.google.dagger.hilt.android") version "2.52" apply false
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -20,6 +22,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val key: String = gradleLocalProperties(rootDir, providers).getProperty("API_KEY")
+        buildConfigField("String", "API_KEY", "\"$key\"")
     }
 
     buildTypes {
@@ -40,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -72,13 +78,15 @@ dependencies {
 
     // Coroutine Lifecycle Scopes
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx.v231)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     // Dagger - Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
-    implementation(libs.androidx.hilt.lifecycle.viewmodel)
+    annotationProcessor(libs.hilt.android.compiler)
+    annotationProcessor(libs.hilt.android)
     kapt(libs.androidx.hilt.compiler)
+    annotationProcessor(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Retrofit
@@ -97,4 +105,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+kapt {
+    correctErrorTypes = true
 }
