@@ -2,6 +2,7 @@ package com.example.movies.common
 
 import com.example.movies.BuildConfig
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 
 object Constants {
     const val BASE_URL = "https://api.themoviedb.org/3/"
@@ -16,6 +17,11 @@ object Constants {
             requestBuilder.addHeader(AUTHORIZATION, BEARER + BuildConfig.API_KEY)
             chain.proceed(requestBuilder.build())
         }
+
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+        httpClient.addInterceptor(interceptor = interceptor)
 
         return httpClient.build()
     }
