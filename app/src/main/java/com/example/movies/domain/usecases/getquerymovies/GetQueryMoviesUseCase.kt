@@ -13,11 +13,11 @@ import javax.inject.Inject
 class GetQueryMoviesUseCase @Inject constructor(
     private val movieRepository: MovieRepository
 ) {
-    suspend fun getMovies(): Flow<Resource<List<Movie>>> = flow {
+    fun getQueryMovies(query: String): Flow<Resource<List<Movie>>> = flow {
         try {
             emit(Resource.Loading())
-            val trendingMovies = movieRepository.getTrendingMovies().results.map { it.toMovie() }
-            emit(Resource.Success(trendingMovies))
+            val queryMovies = movieRepository.getQueryMovies(query = query).results.map { it.toMovie() }
+            emit(Resource.Success(queryMovies))
         } catch (e: HttpException) {
             emit(Resource.Error(e.localizedMessage ?: SERVER_EXCEPTION_MESSAGE))
         } catch (e: IOException) {
