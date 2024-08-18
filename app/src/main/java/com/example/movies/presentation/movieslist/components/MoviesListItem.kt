@@ -12,9 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.movies.R
 import com.example.movies.domain.model.Movie
 
 @Composable
@@ -35,7 +37,8 @@ fun MovieListItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
-                .clip(RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(15.dp)),
+            error = painterResource(id = R.drawable.baseline_error_outline_24)
         )
 
         Text(

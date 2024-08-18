@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val arguments = it.toRoute<MovieDetailsRoute>()
                             MovieDetailsScreen(
+                                navController = navController,
                                 movie = arguments.movieDetails
                             )
                         }
