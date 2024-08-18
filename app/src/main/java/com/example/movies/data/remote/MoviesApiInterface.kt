@@ -9,6 +9,6 @@ interface MoviesApiInterface {
     @GET("trending/movie/day")
     suspend fun getTrendingMovies(): MovieDto
 
-    @GET("search/movie/")
+    @GET("search/movie")
     suspend fun getQueryMovies(@Query("query") query: String): MovieDto
 }
