@@ -1,8 +1,12 @@
 package com.example.movies.presentation.movieslist
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -10,12 +14,16 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.movies.R
 import com.example.movies.domain.model.Movie
 import com.example.movies.presentation.movieslist.components.MovieListItem
 
@@ -24,40 +32,62 @@ fun MoviesListScreen(
     onMovieClick: (Movie) -> Unit,
     viewModel: MoviesListViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
+    val state = viewModel.state.collectAsState()
+    val queryString = viewModel.queryString.collectAsState()
+    val isSearching = viewModel.isSearching.collectAsState()
     
-    Box(
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2)
-        ) {
-            items(state.movies) { movie ->
-                MovieListItem(
-                    movie = movie,
-                    onItemClick = {
-                        onMovieClick(movie)
-                    }
-                )
-            }
-        }
+        TextField(
+            value = queryString.value,
+            onValueChange = viewModel::onSearchQueryChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text(text = "Search") },
+            leadingIcon = { Image(painter = painterResource(id = R.drawable.baseline_search_24), contentDescription = null)  }
+        )
 
-        if (state.error.isNotBlank()) {
+        Spacer(
+            modifier = Modifier
+                .height(16.dp)
+        )
+
+        if (state.value.error.isNotBlank()) {
             Text(
-                text = state.error,
+                text = state.value.error,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
-                    .align(Alignment.Center)
+                    .align(Alignment.CenterHorizontally)
             )
         }
 
-        if (state.isLoading) {
-            CircularProgressIndicator(modifier = Modifier
-                .align(Alignment.Center))
+        if (state.value.isLoading || isSearching.value) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+
+        if (!isSearching.value) {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                columns = GridCells.Fixed(2)
+            ) {
+                items(state.value.movies) { movie ->
+                    MovieListItem(
+                        movie = movie,
+                        onItemClick = {
+                            onMovieClick(movie)
+                        }
+                    )
+                }
+            }
         }
     }
 }
