@@ -60,7 +60,7 @@ fun MovieDetailsScreen(
                 .fillMaxWidth()
                 .padding(top = 20.dp, start = 40.dp, end = 40.dp)
                 .clip(RoundedCornerShape(15.dp)),
-            error = painterResource(id = R.drawable.baseline_error_outline_24)
+            error = painterResource(id = R.drawable.img_not_available_200)
         )
 
         Text(

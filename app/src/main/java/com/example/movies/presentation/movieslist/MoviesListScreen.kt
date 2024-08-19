@@ -83,7 +83,7 @@ fun MoviesListScreen(
         if (state.value.error.isNotBlank()) {
             Text(
                 text = state.value.error,
-                color = MaterialTheme.colorScheme.error,
+                color = Color.Red,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,13 +112,13 @@ fun MoviesListScreen(
                         Image(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             painter = painterResource(
-                                id = R.drawable.baseline_error_outline_24
+                                id = R.drawable.img_not_available_200
                             ),
                             contentDescription = null)
 
                         Text(
                             text = "No movies found",
-                            color = MaterialTheme.colorScheme.error,
+                            color = Color.Red,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxWidth()
