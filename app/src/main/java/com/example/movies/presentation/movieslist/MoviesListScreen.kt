@@ -1,6 +1,5 @@
 package com.example.movies.presentation.movieslist
 
-import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
