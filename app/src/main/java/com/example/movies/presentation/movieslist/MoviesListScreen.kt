@@ -1,5 +1,6 @@
 package com.example.movies.presentation.movieslist
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -102,19 +103,46 @@ fun MoviesListScreen(
         }
 
         if (!isSearching.value) {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                columns = GridCells.Fixed(2)
-            ) {
-                items(state.value.movies) { movie ->
-                    MovieListItem(
-                        movie = movie,
-                        onItemClick = {
-                            onMovieClick(movie)
-                        }
-                    )
+            if (state.value.movies.isEmpty() && queryString.value.isNotBlank()) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                ) {
+                    Column (modifier = Modifier
+                        .fillMaxWidth()
+                    ) {
+                        Image(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            painter = painterResource(
+                                id = R.drawable.baseline_error_outline_24
+                            ),
+                            contentDescription = null)
+
+                        Text(
+                            text = "No movies found",
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    columns = GridCells.Fixed(2)
+                ) {
+                    items(state.value.movies) { movie ->
+                        MovieListItem(
+                            movie = movie,
+                            onItemClick = {
+                                onMovieClick(movie)
+                            }
+                        )
+                    }
                 }
             }
         }
