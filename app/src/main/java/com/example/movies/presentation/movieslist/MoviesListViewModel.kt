@@ -37,7 +37,10 @@ class MoviesListViewModel @Inject constructor(
         .onEach { _isSearching.update { true } }
         .combine(_state) { queryString, state ->
             if (queryString.isBlank()) {
-                getMovies()
+                if (state.error.isBlank()) {
+                    getMovies()
+                }
+
                 state
             } else {
                 searchMovies(queryString)
@@ -59,15 +62,24 @@ class MoviesListViewModel @Inject constructor(
         getTrendingMoviesUseCase.getTrendingMovies().onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = MoviesListState(movies = result.data ?: emptyList())
+                    _state.value = _state.value.copy(
+                        movies = result.data ?: emptyList(),
+                        isLoading = false,
+                        error = ""
+                    )
                 }
 
                 is Resource.Error -> {
-                    _state.value = MoviesListState(error = result.message?: "An unexpected error occurred.")
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = result.message ?: "An unexpected error occurred."
+                    )
                 }
 
                 is Resource.Loading -> {
-                    _state.value = MoviesListState(isLoading = true)
+                    _state.value = _state.value.copy(
+                        isLoading = true
+                    )
                 }
             }
         }.launchIn(viewModelScope)
@@ -78,17 +90,26 @@ class MoviesListViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _isSearching.value = false
-                    _state.value = MoviesListState(movies = result.data ?: emptyList())
+                    _state.value = _state.value.copy(
+                        movies = result.data ?: emptyList(),
+                        isLoading = false,
+                        error = ""
+                    )
                 }
 
                 is Resource.Error -> {
                     _isSearching.value = false
-                    _state.value = MoviesListState(error = result.message?: "An unexpected error occurred.")
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = result.message ?: "An unexpected error occurred."
+                    )
                 }
 
                 is Resource.Loading -> {
                     _isSearching.value = true
-                    _state.value = MoviesListState(isLoading = true)
+                    _state.value = _state.value.copy(
+                        isLoading = true
+                    )
                 }
             }
         }.launchIn(viewModelScope)
