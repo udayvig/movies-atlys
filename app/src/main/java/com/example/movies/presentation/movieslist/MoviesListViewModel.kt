@@ -8,21 +8,20 @@ import com.example.movies.domain.usecases.gettrendingmovies.GetTrendingMoviesUse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class MoviesListViewModel @Inject constructor(
     private val getTrendingMoviesUseCase: GetTrendingMoviesUseCase,
     private val getQueryMoviesUseCase: GetQueryMoviesUseCase
 ) : ViewModel() {
+
     private val _queryString = MutableStateFlow("")
     val queryString = _queryString.asStateFlow()
 
@@ -30,29 +29,20 @@ class MoviesListViewModel @Inject constructor(
     val isSearching = _isSearching.asStateFlow()
 
     private val _state = MutableStateFlow(MoviesListState())
+    val state = _state.asStateFlow()
 
-    @OptIn(FlowPreview::class)
-    val state = queryString
-        .debounce(DEBOUNCE_TIMEOUT)
-        .onEach { _isSearching.update { true } }
-        .combine(_state) { queryString, state ->
-            if (queryString.isBlank()) {
-                if (state.error.isBlank()) {
+    init {
+        queryString
+            .debounce(DEBOUNCE_TIMEOUT)
+            .onEach { query ->
+                if (query.isBlank()) {
                     getMovies()
+                } else {
+                    searchMovies(query)
                 }
-
-                state
-            } else {
-                searchMovies(queryString)
-                state
             }
-        }
-        .onEach { _isSearching.update { false } }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(STOP_TIMEOUT),
-            _state.value
-        )
+            .launchIn(viewModelScope)
+    }
 
     fun onSearchQueryChange(query: String) {
         _queryString.value = query
@@ -60,56 +50,71 @@ class MoviesListViewModel @Inject constructor(
 
     private fun getMovies() {
         getTrendingMoviesUseCase.getTrendingMovies().onEach { result ->
+            _isSearching.update {
+                result is Resource.Loading
+            }
+
             when (result) {
                 is Resource.Success -> {
-                    _state.value = _state.value.copy(
-                        movies = result.data ?: emptyList(),
-                        isLoading = false,
-                        error = ""
-                    )
+                    _state.update {
+                        it.copy(
+                            movies = result.data ?: emptyList(),
+                            isLoading = false,
+                            error = ""
+                        )
+                    }
                 }
 
                 is Resource.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = result.message ?: STATE_ERROR_MESSAGE
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "${STATE_ERROR_MESSAGE}\n${result.message}"
+                        )
+                    }
                 }
 
                 is Resource.Loading -> {
-                    _state.value = _state.value.copy(
-                        isLoading = true
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
                 }
             }
         }.launchIn(viewModelScope)
     }
 
     private fun searchMovies(query: String) {
-        getQueryMoviesUseCase.getQueryMovies(query = query).onEach { result ->
+        getQueryMoviesUseCase.getQueryMovies(query).onEach { result ->
+            _isSearching.update {
+                result is Resource.Loading
+            }
+
             when (result) {
                 is Resource.Success -> {
-                    _isSearching.value = false
-                    _state.value = _state.value.copy(
-                        movies = result.data ?: emptyList(),
-                        isLoading = false,
-                        error = ""
-                    )
+                    _state.update {
+                        it.copy(
+                            movies = result.data ?: emptyList(),
+                            isLoading = false,
+                            error = ""
+                        )
+                    }
                 }
-
                 is Resource.Error -> {
-                    _isSearching.value = false
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = result.message ?: STATE_ERROR_MESSAGE
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "${STATE_ERROR_MESSAGE}\n${result.message}"
+                        )
+                    }
                 }
-
                 is Resource.Loading -> {
-                    _isSearching.value = true
-                    _state.value = _state.value.copy(
-                        isLoading = true
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = true
+                        )
+                    }
                 }
             }
         }.launchIn(viewModelScope)
@@ -117,7 +122,6 @@ class MoviesListViewModel @Inject constructor(
 
     companion object {
         private const val DEBOUNCE_TIMEOUT: Long = 500L
-        private const val STOP_TIMEOUT: Long = 5000L
         private const val STATE_ERROR_MESSAGE = "An unexpected error occurred."
     }
 }
