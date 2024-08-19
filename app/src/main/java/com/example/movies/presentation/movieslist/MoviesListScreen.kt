@@ -13,12 +13,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,12 +41,38 @@ fun MoviesListScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TextField(
+        OutlinedTextField(
             value = queryString.value,
             onValueChange = viewModel::onSearchQueryChange,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = "Search") },
-            leadingIcon = { Image(painter = painterResource(id = R.drawable.baseline_search_24), contentDescription = null)  }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                disabledContainerColor = Color.White,
+                focusedBorderColor = Color.LightGray,
+                unfocusedBorderColor = Color.LightGray,
+                errorBorderColor = Color.LightGray,
+                disabledBorderColor = Color.LightGray,
+                cursorColor = Color.Black
+            ),
+            placeholder = {
+                Text(
+                    text = "Search Movies"
+                )
+            },
+
+            leadingIcon = {
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.baseline_search_24
+                    ),
+                    contentDescription = null
+                )
+            }
         )
 
         Spacer(
@@ -67,7 +95,8 @@ fun MoviesListScreen(
         if (state.value.isLoading || isSearching.value) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color.Black
                 )
             }
         }
