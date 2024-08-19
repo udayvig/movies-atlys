@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.movies.R
+import com.example.movies.common.Constants
 import com.example.movies.domain.model.Movie
 
 @Composable
@@ -32,7 +33,7 @@ fun MovieListItem(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w500" + movie.posterPath,
+            model = Constants.FETCH_IMAGE_BASE_URL + movie.posterPath,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()

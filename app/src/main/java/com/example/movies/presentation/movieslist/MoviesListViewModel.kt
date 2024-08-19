@@ -33,7 +33,7 @@ class MoviesListViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class)
     val state = queryString
-        .debounce(500L)
+        .debounce(DEBOUNCE_TIMEOUT)
         .onEach { _isSearching.update { true } }
         .combine(_state) { queryString, state ->
             if (queryString.isBlank()) {
@@ -50,7 +50,7 @@ class MoviesListViewModel @Inject constructor(
         .onEach { _isSearching.update { false } }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
+            SharingStarted.WhileSubscribed(STOP_TIMEOUT),
             _state.value
         )
 
@@ -72,7 +72,7 @@ class MoviesListViewModel @Inject constructor(
                 is Resource.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = result.message ?: "An unexpected error occurred."
+                        error = result.message ?: STATE_ERROR_MESSAGE
                     )
                 }
 
@@ -101,7 +101,7 @@ class MoviesListViewModel @Inject constructor(
                     _isSearching.value = false
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = result.message ?: "An unexpected error occurred."
+                        error = result.message ?: STATE_ERROR_MESSAGE
                     )
                 }
 
@@ -113,5 +113,11 @@ class MoviesListViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    companion object {
+        private const val DEBOUNCE_TIMEOUT: Long = 500L
+        private const val STOP_TIMEOUT: Long = 5000L
+        private const val STATE_ERROR_MESSAGE = "An unexpected error occurred."
     }
 }

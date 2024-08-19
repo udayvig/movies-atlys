@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.movies.R
+import com.example.movies.common.Constants
 import com.example.movies.domain.model.Movie
 
 @Composable
@@ -34,17 +35,26 @@ fun MovieDetailsScreen(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Button(
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            onClick = { navController.popBackStack() },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White
+            ),
+            onClick = {
+                navController.popBackStack()
+            },
             content = {
-                Image(painter = painterResource(id = R.drawable.baseline_chevron_left_24), contentDescription = null)
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.baseline_chevron_left_24
+                    ),
+                    contentDescription = null
+                )
             },
             modifier = Modifier
                 .padding(top = 10.dp)
         )
 
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w500" + movie.posterPath,
+            model = Constants.FETCH_IMAGE_BASE_URL + movie.posterPath,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()

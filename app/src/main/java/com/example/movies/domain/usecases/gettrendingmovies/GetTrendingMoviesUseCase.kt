@@ -1,5 +1,6 @@
 package com.example.movies.domain.usecases.gettrendingmovies
 
+import com.example.movies.common.Constants
 import com.example.movies.common.Resource
 import com.example.movies.data.remote.dto.toMovie
 import com.example.movies.domain.model.Movie
@@ -19,15 +20,9 @@ class GetTrendingMoviesUseCase @Inject constructor(
             val trendingMovies = movieRepository.getTrendingMovies().results.map { it.toMovie() }
             emit(Resource.Success(trendingMovies))
         } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: SERVER_EXCEPTION_MESSAGE))
+            emit(Resource.Error(e.localizedMessage ?: Constants.SERVER_EXCEPTION_MESSAGE))
         } catch (e: IOException) {
-            emit(Resource.Error(e.localizedMessage ?: IO_EXCEPTION_MESSAGE))
+            emit(Resource.Error(e.localizedMessage ?: Constants.IO_EXCEPTION_MESSAGE))
         }
-    }
-
-    companion object {
-        private const val SERVER_EXCEPTION_MESSAGE: String = "Something went wrong :("
-        private const val IO_EXCEPTION_MESSAGE: String = "Couldn't reach server, please check your internet " +
-                "connection and try again."
     }
 }
